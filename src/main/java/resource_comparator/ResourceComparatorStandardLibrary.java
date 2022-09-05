@@ -1,8 +1,11 @@
+package resource_comparator;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResourceComparatorImpl implements ResourceComparator {
+public class ResourceComparatorStandardLibrary implements ResourceComparator {
+    //All methods are public for the purpose of testing
 
     @Override
     public void resourcesComparison(String input, String output) throws IOException {
@@ -47,7 +50,7 @@ public class ResourceComparatorImpl implements ResourceComparator {
         }
     }
 
-    private String fileComparison(String firstFileLine, List<String> secondFile) {
+    public String fileComparison(String firstFileLine, List<String> secondFile) {
         if (secondFile.isEmpty()) {
             return firstFileLine + ":?";
         }
@@ -66,7 +69,7 @@ public class ResourceComparatorImpl implements ResourceComparator {
         return firstFileLine + ":?";
     }
 
-    private boolean stringArraysComparison(String[] firstFileLineStringArray, String[] secFileLineStringArray) {
+    public boolean stringArraysComparison(String[] firstFileLineStringArray, String[] secFileLineStringArray) {
         for (String word : firstFileLineStringArray) {
             //checking if the word is pretext or preposition
             if (word.length() <= 3) {
@@ -85,23 +88,29 @@ public class ResourceComparatorImpl implements ResourceComparator {
         return false;
     }
 
-    private boolean wordComparison(String word, String wordToCompare) {
+    public boolean wordComparison(String word, String wordToCompare) {
         int comparison = word.compareTo(wordToCompare);
         if (comparison == 0) {
             return true;
         } else if (comparison > 0) {
             //to imitate real lexical analysis we divide the word by two parts
             //hypothesis is that two similar words would probably have
-            //identical word stem or at least identical ending
+            //identical word stem (root) or at least identical ending
+            //thats why we are checking 3 parts of the word
+            //the beginning (in case word doesn't have any prefix),
+            // the ending (in case the root of the word is very short),
+            // the middle (we presume that in most cases, that's where the root is located)
             int x = word.length();
             int substring = x / 2;
             return wordToCompare.contains(word.substring(0, substring)) ||
-                    wordToCompare.contains(word.substring(substring));
+                    wordToCompare.contains(word.substring(substring)) ||
+                    wordToCompare.contains(word.substring(substring/2));
         } else if (comparison < 0) {
             int x = wordToCompare.length();
             int substring = x / 2;
             return word.contains(wordToCompare.substring(0, substring)) ||
-                    word.contains(wordToCompare.substring(substring));
+                    word.contains(wordToCompare.substring(substring)) ||
+                    word.contains(wordToCompare.substring(substring/2));
         }
         return false;
     }
